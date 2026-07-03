@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제로백 PC방 소속팀 랭킹전</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================
+   제로백 PC방 소속팀 랭킹전 — 이벤트 페이지 (시안 B)
+   색상/폰트/여백 등은 아래 :root 변수와 각 클래스에서 수정하세요.
+   리더보드 데이터는 문서 하단 스크립트의 SEASONS / DATA 를 수정하세요.
+   ========================================================= */
+
+@font-face {
+  font-family: 'Rix';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2102-01@1.0/RixYeoljeongdo_Regular.woff') format('woff');
+  font-weight: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg:#0A0A0C;
+  --panel:#141319;
+  --panel2:#1B1B22;
+  --line:#2A2A33;
+  --line2:#3A3A45;
+  --gold:#F5C518;
+  --gold2:#E0A81E;
+  --goldd:#9A7A16;
+  --txt:#F4F4F6;
+  --mut:#9A9AA4;
+  --mut2:#63636C;
+  --up:#35D07F;
+  --down:#FF5A5F;
+  --maxw:1156px;                 /* 콘텐츠 최대 폭 */
+  --cut-lg:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px));
+  --cut-md:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));
+  --cut-sm:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));
+  --cut-btn:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%);
+  --cut-badge:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+}
+
+* { box-sizing:border-box; }
+html, body { margin:0; padding:0; }
+body {
+  background:var(--bg);
+  color:var(--txt);
+  font-family:'Pretendard', system-ui, sans-serif;
+  overflow-x:hidden;
+}
+::selection { background:rgba(245,197,24,.3); }
+img { display:block; }
+b { font-weight:700; }
+
+.wrap { max-width:var(--maxw); margin:0 auto; }
+.gold { color:var(--gold); }
+.mono { font-family:'Chakra Petch', sans-serif; }
+
+/* ---------- 애니메이션 ---------- */
+@keyframes floatEmber { 0%{transform:translateY(0);opacity:0} 12%{opacity:.9} 100%{transform:translateY(-160px);opacity:0} }
+@keyframes glowPulse { 0%,100%{box-shadow:0 8px 30px rgba(245,197,24,.25)} 50%{box-shadow:0 8px 44px rgba(245,197,24,.45),0 0 60px rgba(245,197,24,.25)} }
+@keyframes titleGlow { 0%,100%{text-shadow:0 0 24px rgba(245,197,24,.15)} 50%{text-shadow:0 0 46px rgba(245,197,24,.4)} }
+@keyframes livePulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+@keyframes rise { 0%{opacity:0;transform:translateY(22px)} 100%{opacity:1;transform:translateY(0)} }
+
+/* ---------- HERO ---------- */
+.hero { position:relative; height:860px; overflow:hidden; display:flex; align-items:center; }
+.hero__bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+.hero__scrim1 { position:absolute; inset:0; background:linear-gradient(90deg, rgb(9 9 11 / 24%) 0%, rgb(9 9 11 / 31%) 34%, rgba(9, 9, 11, .28) 60%, transparent 78%) }
+.hero__scrim2 { position:absolute; inset:0; background:linear-gradient(0deg,var(--bg) 0%,transparent 26%); }
+.hero__embers { position:absolute; inset:0; pointer-events:none; }
+.ember { position:absolute; bottom:-12px; border-radius:50%; background:rgba(245,197,24,.7); box-shadow:0 0 7px rgba(245,197,24,.85); }
+.hero__inner { position:relative; width:100%; padding:0 20px; }
+.hero__content { max-width:1000px; animation:rise .8s ease both; }
+
+.logos { display:flex; align-items:center; gap:16px; margin-bottom:30px; }
+.logos img.z { height:32px; }
+.logos img.c { height:21px; opacity:.92; }
+.logos .x { color:var(--mut2); }
+
+.badge {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:8px 16px; margin-bottom:26px;
+  border:1px solid rgba(245,197,24,.4); background:rgba(245,197,24,.08);
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+.badge .dot { width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); animation:livePulse 1.6s infinite; }
+.badge span.t { font-family:'Chakra Petch'; font-weight:600; font-size:15px; letter-spacing:.16em; color:var(--gold); }
+
+.hero h1 {
+  margin:0 0 24px;
+  font-family:'Rix', sans-serif; font-weight:400;
+  font-size:92px; line-height:1.08; letter-spacing:.005em; color:#fff;
+  animation:titleGlow 3.5s ease-in-out infinite;
+}
+.hero__title {
+  display:block;
+  width:100%;
+  max-width:550px;
+  margin:0 0 24px;
+  height:auto;
+}
+.hero p.lead { margin:0 0 34px; font-size:21px; line-height:1.6; color:#D6D6DC; max-width:640px; }
+
+.meta { display:flex; gap:12px; margin-bottom:38px; flex-wrap:wrap; }
+.meta .chip {
+  display:flex; align-items:center; gap:10px; padding:12px 20px;
+  border:1px solid var(--line2); background:rgba(20,19,25,.7); backdrop-filter:blur(6px);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+}
+.meta .chip .k { font-size:13px; color:var(--mut2); }
+.meta .chip .v { font-size:15px; font-weight:600; color:var(--txt); }
+
+/* ---------- 공용 버튼 ---------- */
+.btn-primary {
+  display:inline-flex; align-items:center; gap:12px;
+  padding:19px 42px; border:none; cursor:pointer;
+  background:linear-gradient(135deg,#F7CE2E,var(--gold2)); color:var(--bg);
+  font-family:'Pretendard'; font-weight:800; font-size:19px;
+  clip-path:var(--cut-btn); transition:transform .15s;
+}
+.btn-primary:hover { transform:translateY(-2px); }
+.btn-primary.pulse { animation:glowPulse 2.6s ease-in-out infinite; }
+.btn-ghost {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:16px 38px; border:1px solid var(--gold); cursor:pointer;
+  background:rgba(245,197,24,.08); color:var(--gold);
+  font-family:'Pretendard'; font-weight:700; font-size:17px; transition:all .15s;
+}
+.btn-ghost:hover { background:var(--gold); color:var(--bg); }
+
+/* ---------- 섹션 공통 ---------- */
+.section { padding:88px 20px; }
+.section--tight { padding:40px 20px 96px; }
+.section-head { text-align:center; margin-bottom:60px; }
+.section-head h2 {
+  margin:0 0 18px; font-family:'Rix', sans-serif; font-weight:400;
+  font-size:48px; line-height:1.22; letter-spacing:.005em;
+}
+.section-head p { margin:0 auto; max-width:680px; font-size:18px; line-height:1.7; color:var(--mut); }
+
+/* ---------- 참여 방법 (STEP) ---------- */
+.steps { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; max-width:1560px; margin:0 auto; }
+.step {
+  position:relative; padding:24px; border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--panel),#101015);
+  clip-path:var(--cut-md); transition:transform .2s, box-shadow .2s;
+}
+.step:hover { transform:translateY(-4px); box-shadow:0 20px 50px rgba(245,197,24,.14); }
+.step__no {
+  width:38px; height:38px; margin-bottom:16px;
+  background:var(--gold); color:var(--bg); font-weight:800; font-size:17px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 24px rgba(245,197,24,.4);
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+}
+.step__img {
+  overflow:hidden; border:1px solid var(--line); aspect-ratio:16/9;
+  margin-bottom:14px; background:#0d0d10; padding:8px;
+}
+.step__img img { width:100%; height:100%; object-fit:contain; }
+.step p { margin:0; font-size:15px; line-height:1.5; }
+
+/* 미니 리더보드 (STEP 3 미리보기) */
+.mini { aspect-ratio:16/9; margin-bottom:14px; background:#0d0d10; border:1px solid var(--line); display:flex; flex-direction:column; padding:16px; gap:8px; }
+.mini__top { display:flex; justify-content:space-between; align-items:center; }
+.mini__top .lbl { font-size:12px; color:var(--gold); font-family:'Chakra Petch'; letter-spacing:.12em; }
+.mini__top .dot { width:7px; height:7px; border-radius:50%; background:var(--up); animation:livePulse 1.6s infinite; }
+.mini__row { display:flex; align-items:center; gap:9px; padding:7px 12px; }
+.mini__row.lead { background:rgba(245,197,24,.12); border:1px solid rgba(245,197,24,.35); }
+.mini__row .r { font-weight:700; color:var(--mut2); }
+.mini__row.lead .r { color:var(--gold); font-weight:800; }
+.mini__row .n { font-size:13px; flex:1; color:var(--mut); }
+.mini__row.lead .n { color:var(--txt); }
+.mini__row .k { font-family:'Chakra Petch'; color:var(--mut); }
+.mini__row.lead .k { color:var(--gold); font-weight:700; }
+
+/* 집계 기준 안내 */
+.scoring {
+  margin-top:36px; display:flex; align-items:center; gap:22px; padding:24px 32px;
+  background:linear-gradient(90deg,rgba(245,197,24,.1),rgba(245,197,24,.02));
+  border:1px solid rgba(245,197,24,.28);
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+}
+.scoring .h { display:flex; align-items:center; gap:10px; white-space:nowrap; }
+.scoring .h b { font-size:18px; }
+.scoring .bar { width:1px; height:24px; background:var(--line2); }
+.scoring p { margin:0; font-size:16px; color:var(--mut); }
+
+/* ---------- RANKING & PRIZE ---------- */
+.rp { display:grid; grid-template-columns:340px 1fr; gap:28px; align-items:stretch; }
+
+/* 시즌 경품 카드 */
+.prize { display:flex; flex-direction:column; padding:28px 26px; border:1px solid var(--line); background:var(--panel); clip-path:var(--cut-lg); }
+.prize__eyebrow { font-size:15px; letter-spacing:.06em; color:var(--gold); font-family:'Chakra Petch'; margin-bottom:6px; }
+.prize h3 { margin:0 0 26px; font-weight:800; font-size:26px; }
+.prize__list { flex:1; display:flex; flex-direction:column; gap:14px; }
+.prize__item {
+  flex:1; display:flex; align-items:center; gap:13px; padding:16px 18px;
+  background:var(--panel2); border:1px solid var(--line); clip-path:var(--cut-sm);
+}
+.prize__item.first { background:linear-gradient(135deg,rgba(245,197,24,.16),rgba(245,197,24,.03)); border:1px solid rgba(245,197,24,.4); box-shadow:0 0 34px rgba(245,197,24,.1); }
+.prize__rank {
+  flex:none; width:38px; height:38px; color:var(--bg);
+  font-family:'Chakra Petch'; font-weight:700; font-size:20px;
+  display:flex; align-items:center; justify-content:center; clip-path:var(--cut-badge);
+}
+.prize__rank.g1 { background:linear-gradient(135deg,#F7CE2E,#D89A16); }
+.prize__rank.g2 { background:linear-gradient(135deg,#D7DBE2,#9BA0AB); }
+.prize__rank.g3 { background:linear-gradient(135deg,#D69463,#A66A3C); }
+.prize__label { flex:1; min-width:0; }
+.prize__label .team { font-weight:800; font-size:18px; line-height:1.15; }
+.prize__label .en { font-family:'Chakra Petch'; font-size:11px; letter-spacing:.14em; color:var(--mut2); }
+.prize__item.first .prize__label .en { color:var(--gold); }
+.prize__amt { flex:none; font-family:'Chakra Petch'; font-weight:700; color:var(--txt); white-space:nowrap; }
+.prize__item.first .prize__amt { color:var(--gold); }
+.prize__amt .num { font-size:32px; }
+.prize__amt .won { font-size:15px; }
+.prize__amt.mut .won { color:var(--mut); }
+.prize__notes { margin-top:22px; display:flex; flex-direction:column; gap:7px; }
+.prize__notes div { display:flex; gap:8px; font-size:13px; color:var(--mut2); }
+
+/* 시즌 탭 */
+.tabs { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:10px; }
+.tab {
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:13px 6px; border:none; cursor:pointer; font-family:'Pretendard';
+  background:#17171e; color:var(--mut); transition:all .18s;
+  clip-path:polygon(11px 0,100% 0,100% calc(100% - 11px),calc(100% - 11px) 100%,0 100%,0 11px);
+}
+.tab .nm { font-weight:800; font-size:17px; }
+.tab .rg { font-size:11px; opacity:.75; font-family:'Chakra Petch'; }
+.tab.active { background:linear-gradient(135deg,#F7CE2E,var(--gold2)); color:var(--bg); }
+.tab.upcoming { background:#131318; color:var(--mut2); cursor:not-allowed; opacity:.55; }
+
+/* 리더보드 박스 */
+.board { border:1px solid var(--line2); background:linear-gradient(180deg,#141319,#0e0e12); overflow:hidden; clip-path:var(--cut-md); box-shadow:0 30px 80px rgba(0,0,0,.5); }
+.board__head { display:flex; align-items:center; justify-content:space-between; padding:22px 26px; border-bottom:1px solid var(--line); }
+.board__title { display:flex; align-items:center; gap:12px; }
+.board__title .dot { width:9px; height:9px; border-radius:50%; background:var(--up); box-shadow:0 0 10px var(--up); animation:livePulse 1.6s infinite; }
+.board__title h3 { margin:0; font-weight:800; font-size:22px; white-space:nowrap; }
+.board__title .live { font-size:13px; color:var(--gold); font-family:'Chakra Petch'; border:1px solid rgba(245,197,24,.4); padding:3px 10px; clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%); }
+.search { position:relative; width:280px; }
+.search .ic { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--mut2); }
+.search input { width:100%; padding:12px 14px 12px 40px; background:var(--panel2); border:1px solid var(--line2); color:var(--txt); font-family:'Pretendard'; font-size:15px; outline:none; }
+
+.board__cols { display:grid; grid-template-columns:72px 1fr 130px 150px 92px; padding:14px 26px; font-size:13px; color:var(--mut2); border-bottom:1px solid var(--line); letter-spacing:.02em; white-space:nowrap; }
+.board__cols .r { text-align:right; }
+.board__scroll { height:440px; overflow-y:auto; }
+
+.row { display:grid; grid-template-columns:72px 1fr 130px 150px 92px; align-items:center; padding:15px 26px; border-bottom:1px solid rgba(42,42,51,.6); }
+.row.top3 { background:rgba(245,197,24,.03); }
+.row__rank { width:38px; height:38px; display:flex; align-items:center; justify-content:center; font-family:'Chakra Petch'; font-weight:700; font-size:20px; color:var(--mut2); }
+.row__rank.b1 { color:var(--bg); background:linear-gradient(135deg,#F7CE2E,#D89A16); clip-path:var(--cut-badge); }
+.row__rank.b2 { color:var(--bg); background:linear-gradient(135deg,#D7DBE2,#9BA0AB); clip-path:var(--cut-badge); }
+.row__rank.b3 { color:var(--bg); background:linear-gradient(135deg,#D69463,#A66A3C); clip-path:var(--cut-badge); }
+.row__store { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.row__store .nm { display:flex; align-items:center; gap:8px; }
+.row__store .nm b { font-weight:700; font-size:16px; color:var(--txt); white-space:nowrap; }
+.row__store .crown { font-size:16px; line-height:1; }
+.row__store .loc { font-size:13px; color:var(--mut2); }
+.row__people { display:flex; align-items:center; justify-content:flex-end; font-size:16px; color:var(--mut); }
+.row__kills { display:flex; align-items:center; justify-content:flex-end; font-family:'Chakra Petch'; font-weight:700; font-size:19px; color:var(--txt); }
+.row__kills.gold { color:var(--gold); }
+.row__move { display:flex; align-items:center; justify-content:flex-end; gap:4px; font-family:'Chakra Petch'; font-weight:600; font-size:14px; }
+.row__move.up { color:var(--up); }
+.row__move.down { color:var(--down); }
+.row__move.same { color:var(--mut2); }
+
+.board__empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:8px; color:var(--mut2); }
+.board__empty .ic { font-size:28px; }
+
+.updated { display:flex; justify-content:flex-end; align-items:center; gap:16px; margin-top:14px; }
+.updated .u { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--mut); }
+.updated .u b { color:var(--txt); font-family:'Chakra Petch'; font-weight:600; }
+.updated .note { font-size:13px; color:var(--mut2); }
+
+/* 하단 CTA */
+.cta { margin-top:60px; text-align:center; padding:48px; border:1px solid var(--line); background:linear-gradient(rgba(10,10,12,.72), rgba(10,10,12,.72)), url('assets/01.jpg') no-repeat right center; background-size:70% auto; clip-path:var(--cut-lg); }
+.cta h3 { margin:0 0 8px; font-weight:800; font-size:26px; }
+.cta p { margin:0 0 26px; font-size:16px; color:var(--mut); }
+
+/* 유의사항 */
+.terms { padding:20px 20px 90px; }
+.terms__inner { border-top:1px solid var(--line); padding-top:40px; }
+.terms { white-space:normal; word-break:keep-all; }
+.terms h3 { margin:0 0 22px; font-weight:800; font-size:20px; }
+.terms ul { margin:0; padding:0; list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:10px 50px; }
+.terms li { display:flex; gap:10px; font-size:14px; line-height:1.55; color:var(--mut); overflow-wrap:break-word; }
+.terms li .b { color:var(--gold); }
+.terms__logos { margin-top:40px; display:flex; align-items:center; gap:14px; opacity:.5; }
+.terms__logos img.z { height:20px; }
+.terms__logos img.c { height:14px; }
+.terms__logos .x { color:var(--mut2); }
+</style>
+</head>
+
+<body>
+
+  <!-- ============================= HERO ============================= -->
+  <section class="hero">
+    <img class="hero__bg" src="assets/01_KV.jpg" alt="ZERO100 Trophy">
+    <div class="hero__scrim1"></div>
+    <div class="hero__scrim2"></div>
+    <div class="hero__embers" id="embers"></div>
+    <div class="hero__inner wrap">
+      <div class="hero__content">
+        <div class="logos">
+          <img class="z" src="assets/zero100_logo.png" alt="ZERO100">
+          <span class="x">×</span>
+          <img class="c" src="assets/logo_craftbox.png" alt="CraftBox">
+        </div>
+       
+        <img class="hero__title" src="assets/title.png" alt="제로백 PC방 소속팀 랭킹전">
+        <p class="lead">전국 제로백 매장이 각각의 소속팀이 되어 겨루는 PUBG 랭킹전.<br>상위권 매장에 <b class="gold">최대 30만원</b> 상금 증정!</p>
+        <div class="meta">
+          <div class="chip"><span class="k">이벤트 기간</span><span class="v">2026. 07. 15 ~ 2026. 09. 08</span></div>
+          <div class="chip"><span class="k">참여대상</span><span class="v">피카 가맹 제로백 PC방</span></div>
+        </div>
+        <button class="btn-primary pulse" onclick="scrollToBoard()">우리 매장 순위 확인하기 <span style="font-size:22px;">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+
+    <!-- ======================= 참여 방법 ======================= -->
+    <section class="section">
+      <div class="section-head">
+        <h2>단 <span class="gold">3단계</span>면, 우리 매장 순위가 오릅니다</h2>
+        <p>단골 제로백 PC방을 <b style="color:var(--txt);">소속팀으로 등록</b>하고 배틀그라운드를 플레이하면 끝.<br>상위권 매장에 주어지는 <b style="color:var(--txt);">상금</b>에 도전하세요.</p>
+      </div>
+
+      <div class="steps">
+        <!-- STEP 1 -->
+        <div class="step">
+          <div class="step__no">1</div>
+          <div class="step__img"><img src="assets/img_01.png" alt="배그 랭킹전 버튼"></div>
+          <p>PC방 바탕화면 상단 <b class="gold">[배그 랭킹전]</b> 버튼을 클릭.</p>
+        </div>
+        <!-- STEP 2 -->
+        <div class="step">
+          <div class="step__no">2</div>
+          <div class="step__img"><img src="assets/img_02.png" alt="소속팀 참가 신청"></div>
+          <p>랭킹전 메뉴에서 <b class="gold">'제로백 PC방' 소속팀</b> 으로 <br>참가 신청!</p>
+        </div>
+        <!-- STEP 3 -->
+        <div class="step">
+          <div class="step__no">3</div>
+          <div class="mini">
+            <div class="mini__top"><span class="lbl">LIVE LEADERBOARD</span><span class="dot"></span></div>
+            <div class="mini__row lead"><span class="r">1</span><span class="n">제로백 부평역점</span><span class="k">6,420</span></div>
+            <div class="mini__row"><span class="r">2</span><span class="n">제로백 강남본점</span><span class="k">6,180</span></div>
+          </div>
+          <p><b class="gold">OTP 연동</b> 후 플레이하면 소속팀 리더보드에 <br>점수가 자동 집계!</p>
+        </div>
+      </div>
+
+      <div class="scoring">
+        <div class="h"><span class="gold" style="font-size:20px;">◈</span><b>시즌 3~6 집계 기준 : 킬(KILL) 수</b></div>
+        <span class="bar"></span>
+        <p>랭킹전에 참여한 유저들의 배틀그라운드 킬(Kill) 수를 합산해 매장별 순위를 집계합니다. (일반/경쟁전)</p>
+      </div>
+    </section>
+
+    <!-- ======================= RANKING & PRIZE ======================= -->
+    <section class="section--tight" id="board">
+      <div class="section-head" style="margin-bottom:46px;">
+        <h2 style="font-size:44px;">우리 매장 순위 &amp; <span class="gold">시즌 경품</span></h2>
+        <p style="max-width:600px;font-size:17px;line-height:1.6;">지금 우리 매장 순위를 확인하고, 시즌마다 지급되는 경품을 노려보세요!</p>
+      </div>
+
+      <div class="rp">
+        <!-- 시즌 경품 -->
+        <div class="prize">
+          <div class="prize__eyebrow">SEASON PRIZE</div>
+          <h3>시즌 경품</h3>
+          <div class="prize__list">
+            <div class="prize__item first">
+              <span class="prize__rank g1">1</span>
+              <div class="prize__label"><div class="team">1위 팀</div><div class="en">1ST</div></div>
+              <div class="prize__amt"><span class="num">30</span><span class="won">만원</span></div>
+            </div>
+            <div class="prize__item">
+              <span class="prize__rank g2">2</span>
+              <div class="prize__label"><div class="team">2위 팀</div><div class="en">2ND</div></div>
+              <div class="prize__amt mut"><span class="num">20</span><span class="won">만원</span></div>
+            </div>
+            <div class="prize__item">
+              <span class="prize__rank g3">3</span>
+              <div class="prize__label"><div class="team">3위 팀</div><div class="en">3RD</div></div>
+              <div class="prize__amt mut"><span class="num">10</span><span class="won">만원</span></div>
+            </div>
+          </div>
+          <div class="prize__notes">
+            <div><span>*</span><span>매 시즌 종료 시마다 지급됩니다.</span></div>
+            <div><span>*</span><span>경품은 참여 팀원에게 균등 분배됩니다.</span></div>
+          </div>
+        </div>
+
+        <!-- 리더보드 -->
+        <div>
+          <div class="tabs" id="tabs"><!-- JS로 렌더 --></div>
+
+          <div class="board">
+            <div class="board__head">
+              <div class="board__title">
+                <span class="dot"></span>
+                <h3 id="board-title">CBL: PUBG 시즌4</h3>
+                <span class="live">LIVE</span>
+              </div>
+              <div class="search">
+                <span class="ic">🔍</span>
+                <input type="text" id="search" placeholder="매장명 검색" oninput="onSearch(this.value)">
+              </div>
+            </div>
+            <div class="board__cols">
+              <span>순위</span><span>매장명</span><span class="r">참여인원</span><span class="r">킬수</span><span class="r">변동</span>
+            </div>
+            <div class="board__scroll" id="rows"><!-- JS로 렌더 --></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="updated">
+        <div class="u"><span class="gold">🕐</span>최종 업데이트 : <b>2026.07.06 00:00</b></div>
+        <span class="note">*매 60분마다 업데이트 됩니다.</span>
+      </div>
+
+      <!-- 하단 CTA -->
+      <div class="cta">
+        <h3>CBL: PUBG 랭킹전이 궁금하다면?</h3>
+        <p>참여 방법 · 점수 산정 · 경품 등 자세한 내용은 랭킹전 안내 페이지에서 확인하세요.</p>
+        <button class="btn-ghost">랭킹전 안내 페이지 보기 <span>→</span></button>
+      </div>
+    </section>
+
+    <!-- ======================= 유의사항 ======================= -->
+    <section class="terms">
+      <div class="terms__inner">
+        <h3>꼭 확인하세요!</h3>
+        <ul id="terms"><!-- JS로 렌더 --></ul>
+        <div class="terms__logos">
+          <img class="z" src="assets/zero100_logo.png" alt="ZERO100">
+          <span class="x">×</span>
+          <img class="c" src="assets/logo_craftbox.png" alt="CraftBox">
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
