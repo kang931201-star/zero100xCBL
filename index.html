@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=1156">
 <title>제로백 PC방 소속팀 랭킹전</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,12 +47,11 @@
 }
 
 * { box-sizing:border-box; }
-html, body { margin:0; padding:0; }
+html, body { margin:0; padding:0; min-width:var(--maxw); overflow-x:auto; }
 body {
   background:var(--bg);
   color:var(--txt);
   font-family:'Pretendard', system-ui, sans-serif;
-  overflow-x:auto;
 }
 ::selection { background:rgba(245,197,24,.3); }
 img { display:block; }
