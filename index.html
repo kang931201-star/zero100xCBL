@@ -52,13 +52,13 @@ body {
   background:var(--bg);
   color:var(--txt);
   font-family:'Pretendard', system-ui, sans-serif;
-  overflow-x:hidden;
+  overflow-x:auto;
 }
 ::selection { background:rgba(245,197,24,.3); }
 img { display:block; }
 b { font-weight:700; }
 
-.wrap { max-width:var(--maxw); margin:0 auto; }
+.wrap { width:100%; max-width:var(--maxw); min-width:var(--maxw); margin:0 auto; }
 .gold { color:var(--gold); }
 .mono { font-family:'Chakra Petch', sans-serif; }
 
